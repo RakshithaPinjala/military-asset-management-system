@@ -63,4 +63,3 @@ Both the frontend and backend contain `Dockerfile`s optimized for production env
 1. **Backend**: A multi-stage build that compiles TypeScript and runs only the JS artifacts.
 2. **Frontend**: A multi-stage build that compiles the Vite React app into static files and serves them via an Nginx alpine container (`nginx.conf` provided for SPA routing).
 
-*Note: In production, ensure the `apiClient.ts` in the frontend points to the correct backend domain instead of `localhost:3000`, or use an API gateway to route `/api` requests.*
