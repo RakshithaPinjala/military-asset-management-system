@@ -1,12 +1,7 @@
 import axios from 'axios';
 
-let rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
-if (rawBaseUrl && !rawBaseUrl.endsWith('api') && !rawBaseUrl.endsWith('api/')) {
-    rawBaseUrl = rawBaseUrl.endsWith('/') ? `${rawBaseUrl}api` : `${rawBaseUrl}/api`;
-}
-
 export const apiClient = axios.create({
-  baseURL: rawBaseUrl,
+  baseURL: 'https://military-asset-management-system-pu4u.onrender.com/api',
 });
 
 apiClient.interceptors.request.use((config) => {
