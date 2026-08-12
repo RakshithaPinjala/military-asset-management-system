@@ -2,7 +2,11 @@
   "name": "military-asset-management-system-root",
   "version": "1.0.0",
   "private": true,
+  "dependencies": {
+    "express": "^4.18.2"
+  },
   "scripts": {
+    "build": "cd backend && npm install && npx prisma generate && npm run build",
     "postinstall": "cd backend && npm install && npx prisma generate && npm run build",
     "start": "cd backend && npm start"
   }
