@@ -54,8 +54,8 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         baseId: user.baseId,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Login error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal server error', details: error.message || String(error) });
   }
 };
