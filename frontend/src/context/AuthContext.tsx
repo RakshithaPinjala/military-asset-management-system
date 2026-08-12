@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiClient } from '../api/client';
 import { jwtDecode } from 'jwt-decode';
 
 export type UserPayload = {
