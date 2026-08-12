@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  BASE_COMMANDER
+  LOGISTICS_OFFICER
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(LOGISTICS_OFFICER)
+  name      String
+  
+  baseId    String?
+  base      Base?    @relation(fields: [baseId], references: [id], onDelete: SetNull)
+
+  auditLogs AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Base {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  location  String?
+
+  users     User[]
+  
+  purchases      Purchase[]
+  transfersOut   Transfer[]    @relation("SourceBase")
+  transfersIn    Transfer[]    @relation("DestinationBase")
+  assignments    Assignment[]
+  expenditures   Expenditure[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EquipmentType {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  category    String   // e.g., VEHICLE, WEAPON, AMMUNITION
+  description String?
+
+  purchases      Purchase[]
+  transfers      Transfer[]
+  assignments    Assignment[]
+  expenditures   Expenditure[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Purchase {
+  id              String   @id @default(uuid())
+  baseId          String
+  equipmentTypeId String
+  quantity        Int
+  supplier        String?
+  notes           String?
+
+  base          Base          @relation(fields: [baseId], references: [id], onDelete: Restrict)
+  equipmentType EquipmentType @relation(fields: [equipmentTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@index([baseId])
+  @@index([equipmentTypeId])
+  @@index([createdAt])
+}
+
+model Transfer {
+  id              String   @id @default(uuid())
+  sourceBaseId    String
+  destinationBaseId String
+  equipmentTypeId String
+  quantity        Int
+  status          String   @default("COMPLETED")
+  notes           String?
+
+  sourceBase      Base          @relation("SourceBase", fields: [sourceBaseId], references: [id], onDelete: Restrict)
+  destinationBase Base          @relation("DestinationBase", fields: [destinationBaseId], references: [id], onDelete: Restrict)
+  equipmentType   EquipmentType @relation(fields: [equipmentTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@index([sourceBaseId])
+  @@index([destinationBaseId])
+  @@index([equipmentTypeId])
+  @@index([createdAt])
+}
+
+enum AssignmentStatus {
+  ACTIVE
+  RETURNED
+}
+
+model Assignment {
+  id              String           @id @default(uuid())
+  baseId          String
+  equipmentTypeId String
+  quantity        Int
+  assignedTo      String           
+  status          AssignmentStatus @default(ACTIVE)
+  notes           String?
+
+  base          Base          @relation(fields: [baseId], references: [id], onDelete: Restrict)
+  equipmentType EquipmentType @relation(fields: [equipmentTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([baseId])
+  @@index([equipmentTypeId])
+  @@index([createdAt])
+}
+
+model Expenditure {
+  id              String   @id @default(uuid())
+  baseId          String
+  equipmentTypeId String
+  quantity        Int
+  reason          String
+  notes           String?
+
+  base          Base          @relation(fields: [baseId], references: [id], onDelete: Restrict)
+  equipmentType EquipmentType @relation(fields: [equipmentTypeId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@index([baseId])
+  @@index([equipmentTypeId])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String
+  action    String   
+  entity    String   
+  entityId  String   
+  details   Json     
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}

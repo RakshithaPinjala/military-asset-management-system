@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:15
+    container_name: mams_db
+    environment:
+      POSTGRES_USER: mams_user
+      POSTGRES_PASSWORD: mams_password
+      POSTGRES_DB: mams
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
